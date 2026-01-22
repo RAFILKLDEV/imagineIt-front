@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { api, resolveImageUrl } from '../services/api';
 import { useCampaign } from '../context/CampaignContext';
 
@@ -6,6 +7,7 @@ type Character = any;
 
 export default function Characters() {
   const { current } = useCampaign();
+  const { id } = useParams();
 
   const [items, setItems] = useState<Character[]>([]);
   const [selected, setSelected] = useState<Character | null>(null);
@@ -35,6 +37,18 @@ export default function Characters() {
       .get('/characters', { params: { campanhaId: current._id } })
       .then(r => setItems(r.data));
   }, [current]);
+
+  useEffect(() => {
+    if (!id) {
+      setSelected(null);
+      return;
+    }
+
+    const match = items.find(item => item._id === id);
+    if (match) {
+      setSelected(match);
+    }
+  }, [id, items]);
 
   /* =======================
      CREATE CHARACTER

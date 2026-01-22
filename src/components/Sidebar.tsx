@@ -20,7 +20,7 @@ export default function Sidebar() {
     }
 
     api
-      .get(`/characters?campaign=${current._id}`)
+      .get(`/characters?campanhaId=${current._id}`)
       .then(res => setCharacters(res.data));
   }, [current]);
 

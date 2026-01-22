@@ -12,6 +12,7 @@ export default function App(){
           <Routes>
             <Route path="/" element={<Campaigns/>}/>
             <Route path="/characters" element={<Characters/>}/>
+            <Route path="/characters/:id" element={<Characters/>}/>
           </Routes>
         </AppLayout>
       </CampaignProvider>
