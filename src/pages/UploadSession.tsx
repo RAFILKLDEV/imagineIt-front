@@ -1,26 +1,44 @@
-import { useState } from 'react';
-import { api } from '../services/api';
-import { useCampaign } from '../context/CampaignContext';
+import axios from "axios";
 
-export default function UploadSession(){
-  const { current } = useCampaign();
-  const [file,setFile]=useState<File|null>(null);
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
-  async function send(){
-    if(!current) return alert('Selecione uma campanha');
-    if(!file) return alert('Selecione um arquivo');
-    const fd = new FormData();
-    fd.append('audio', file);
-    fd.append('campanhaId', current._id);
-    await api.post('/sessions/upload', fd);
-    alert('Enviado');
+export async function uploadSession(file: File) {
+  const { data: create } = await axios.post("/sessions/multipart/create", {
+    filename: file.name,
+    contentType: file.type,
+  });
+
+  const { uploadId, key } = create;
+
+  const parts = [];
+  let partNumber = 1;
+  let start = 0;
+
+  while (start < file.size) {
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const blob = file.slice(start, end);
+
+    const { data: presigned } = await axios.post("/sessions/multipart/presign", {
+      key,
+      uploadId,
+      partNumber,
+    });
+
+    const res = await fetch(presigned.url, {
+      method: "PUT",
+      body: blob,
+    });
+
+    const etag = res.headers.get("ETag")?.replaceAll('"', "");
+    parts.push({ PartNumber: partNumber, ETag: etag });
+
+    start = end;
+    partNumber++;
   }
 
-  return (
-    <div className="max-w-xl bg-card p-4">
-      <h2 className="text-lg font-semibold mb-2">Enviar Sessão</h2>
-      <input type="file" onChange={e=>setFile(e.target.files?.[0]||null)}/>
-      <button onClick={send} className="bg-accent text-black px-3 py-1 mt-2">Enviar</button>
-    </div>
-  );
+  await axios.post("/sessions/multipart/complete", {
+    key,
+    uploadId,
+    parts,
+  });
 }

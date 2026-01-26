@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import axios from 'axios';
 
 // Single source of truth for the backend URL so requests and image links stay aligned
@@ -8,20 +9,23 @@ export const api = axios.create({
 });
 
 // Helper to normalize image fields returned by the API
-export function resolveImageUrl(imagem: unknown): string {
-  if (!imagem) return '';
+export function resolveImageUrl(value: unknown): string {
+  if (!value) return '';
 
-  const url =
-    typeof imagem === 'string'
-      ? imagem
-      : (imagem as any).url ||
-        (imagem as any).path ||
-        (imagem as any).location ||
-        ((imagem as any).filename ? `/uploads/${(imagem as any).filename}` : '');
+  const path =
+    typeof value === 'string'
+      ? value
+      : (value as any).url ||
+        (value as any).path ||
+        (value as any).location ||
+        ((value as any).filename ? `/storage/${(value as any).filename}` : '');
 
-  if (!url) return '';
-  if (url.startsWith('http')) return url;
+  if (!path) return '';
 
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `${API_URL}${normalized}`;
+  // já é URL absoluta
+  if (path.startsWith('http')) return path;
+
+  const clean = path.startsWith('/') ? path : `/${path}`;
+  return `${API_URL}${clean}`;
 }
+

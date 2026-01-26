@@ -1,0 +1,4 @@
+// ignorar qualquer zip na base do projeto
+// ignorar node_modules
+node_modules/
+*.zip

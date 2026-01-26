@@ -10,6 +10,7 @@ type CampaignCtx = {
   reloadCampaigns: () => Promise<void>;
 };
 
+const STORAGE_KEY = 'rpg:selectedCampaign';
 const Ctx = createContext<CampaignCtx | null>(null);
 
 export function CampaignProvider({ children }: { children: React.ReactNode }) {
@@ -19,15 +20,34 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   async function reloadCampaigns() {
     const r = await api.get('/campaigns');
     setCampaigns(r.data);
+    return r.data;
   }
 
   useEffect(() => {
-    reloadCampaigns();
+    reloadCampaigns().then(data => {
+      const storedId =
+        typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+      const selected =
+        (storedId && data.find((c: Campaign) => c._id === storedId)) || data[0];
+      if (selected) setCurrent(selected);
+    });
   }, []);
+
+  useEffect(() => {
+    if (!current) return;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, current._id);
+    }
+  }, [current]);
 
   function setCurrentById(id: string) {
     const c = campaigns.find(c => c._id === id);
-    if (c) setCurrent(c);
+    if (c) {
+      setCurrent(c);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEY, c._id);
+      }
+    }
   }
 
   return (
