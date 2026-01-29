@@ -3,6 +3,7 @@ import axios from 'axios';
 import { api, resolveImageUrl } from '../services/api';
 import { useCampaign } from '../context/CampaignContext';
 import { useToast } from '../hooks/useToast';
+import { useNavigate } from 'react-router-dom';
 
 type Session = any;
 
@@ -42,6 +43,8 @@ export default function Sessions() {
     if (id === null || id === undefined) return null;
     return String(id);
   };
+
+  const navigate = useNavigate()
 
   const toNumero = (value: unknown): number | null => {
     if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -540,7 +543,7 @@ export default function Sessions() {
           url: audioUrl,
           language: 'pt',
           context: 'rpg',
-          diarize: false
+          diarize: true
         },
         { timeout: 1000 * 60 * 45 }
       );
@@ -768,6 +771,19 @@ export default function Sessions() {
                   {isTranscribing ? 'Transcrevendo...' : 'Gerar transcrição'}
                 </button>
 
+                {selected && <button
+                  type="button"
+                  onClick={() => {
+                    const sessionId = getSessionId(selected);
+                    if (sessionId) {
+                      navigate(`/sessions/${sessionId}`);
+                    }
+                  }}
+                  className="rounded-2xl border border-cyan-400/40 px-5 py-3 text-sm font-semibold uppercase text-cyan-200 transition hover:text-white disabled:opacity-60"
+                >
+                  Visualizar Sessão
+                </button>}
+
                 {selected && (
                   <button
                     type="button"
@@ -858,7 +874,7 @@ export default function Sessions() {
             </div>
           </div>
         </section>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }

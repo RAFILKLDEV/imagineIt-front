@@ -6,6 +6,7 @@ import Characters from './pages/Characters';
 import Sessions from './pages/Sessions';
 import Scenarios from './pages/Scenarios';
 import { ToastProvider } from './components/ToastProvider';
+import SessionViewer from './pages/SessionViewer';
 
 export default function App(){
   return (
@@ -19,6 +20,7 @@ export default function App(){
               <Route path="/characters/:id" element={<Characters/>}/>
               <Route path="/sessions" element={<Sessions/>}/>
               <Route path="/scenarios" element={<Scenarios/>}/>
+              <Route path="/sessions/:id" element={<SessionViewer />} />
             </Routes>
           </AppLayout>
         </ToastProvider>
