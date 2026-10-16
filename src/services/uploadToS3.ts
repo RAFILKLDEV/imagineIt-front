@@ -1,55 +1,40 @@
-/**
- * Upload direto para S3 usando URL pré-assinada
- * NÃO envia arquivo para o backend
- */
+import { api } from './api';
 
 type PresignResponse = {
   uploadUrl: string;
-  fileUrl: string;
+  bucket: string;
+  key: string;
+  contentType?: string;
 };
 
 export async function uploadToS3(
   file: File,
   campanhaId: string,
-  tipo: string = "characters"
-): Promise<string> {
+  tipo: string = 'characters'
+): Promise<{ bucket: string; key: string }> {
   if (!file) {
-    throw new Error("Arquivo não informado");
+    throw new Error('Arquivo nao informado');
   }
 
-  // 1️⃣ Pede a URL pré-assinada para o backend
-  const presignResponse = await fetch("http://localhost:4000/upload/presign", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      campanhaId,
-      tipo,
-      contentType: file.type,
-    }),
+  const { data } = await api.post<PresignResponse>('/upload/presign', {
+    campanhaId,
+    tipo,
+    contentType: file.type,
+    fileSize: file.size,
+    filename: file.name,
   });
 
-  if (!presignResponse.ok) {
-    throw new Error("Erro ao obter URL de upload");
-  }
-
-  const { uploadUrl, fileUrl }: PresignResponse =
-    await presignResponse.json();
-
-  // 2️⃣ Faz upload direto no S3
-  const uploadResult = await fetch(uploadUrl, {
-    method: "PUT",
+  const uploadResult = await fetch(data.uploadUrl, {
+    method: 'PUT',
     headers: {
-      "Content-Type": file.type,
+      'Content-Type': data.contentType || file.type || 'application/octet-stream',
     },
     body: file,
   });
 
   if (!uploadResult.ok) {
-    throw new Error("Erro ao enviar arquivo para o S3");
+    throw new Error('Erro ao enviar arquivo para o S3');
   }
 
-  // 3️⃣ Retorna apenas a URL final (salve no banco)
-  return fileUrl;
+  return { bucket: data.bucket, key: data.key };
 }

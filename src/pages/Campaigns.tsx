@@ -97,7 +97,7 @@ export default function Campaigns() {
                     }`}
                     onClick={() => handleSelect(c._id)}
                   >
-                    <span>{c.nome}</span>
+                    <span>{c.nome}<small className="block text-xs text-white/50">ID para /campanha sincronizar: {c._id}</small></span>
                     {current?._id === c._id && (
                       <span className="text-xs uppercase tracking-[0.3em] text-emerald-300">Ativa</span>
                     )}

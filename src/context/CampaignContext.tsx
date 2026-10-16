@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { api } from '../services/api';
 
 type Campaign = { _id: string; nome: string };
@@ -7,7 +7,7 @@ type CampaignCtx = {
   campaigns: Campaign[];
   current?: Campaign;
   setCurrentById: (id: string) => void;
-  reloadCampaigns: () => Promise<void>;
+  reloadCampaigns: () => Promise<Campaign[]>;
 };
 
 const STORAGE_KEY = 'rpg:selectedCampaign';
@@ -15,10 +15,13 @@ const Ctx = createContext<CampaignCtx | null>(null);
 
 export function CampaignProvider({ children }: { children: React.ReactNode }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const campaignsRef = useRef<Campaign[]>([]);
   const [current, setCurrent] = useState<Campaign | undefined>();
 
   async function reloadCampaigns() {
-    const r = await api.get('/campaigns');
+    const r = await api.get<Campaign[]>('/campaigns');
+    if (!Array.isArray(r.data)) throw new Error("A API de campanhas retornou dados invalidos. Confira VITE_API_URL.");
+    campaignsRef.current = r.data;
     setCampaigns(r.data);
     return r.data;
   }
@@ -41,7 +44,7 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
   }, [current]);
 
   function setCurrentById(id: string) {
-    const c = campaigns.find(c => c._id === id);
+    const c = campaignsRef.current.find(c => c._id === id);
     if (c) {
       setCurrent(c);
       if (typeof window !== 'undefined') {

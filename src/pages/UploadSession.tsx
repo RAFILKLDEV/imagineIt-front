@@ -1,44 +1,60 @@
-import axios from "axios";
+import { api } from '../services/api';
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const CHUNK_SIZE = 5 * 1024 * 1024;
 
-export async function uploadSession(file: File) {
-  const { data: create } = await axios.post("/sessions/multipart/create", {
+export async function uploadSession(file: File, campanhaId: string) {
+  const { data: create } = await api.post('/upload/multipart/create', {
+    campanhaId,
+    tipo: 'sessions',
     filename: file.name,
     contentType: file.type,
+    fileSize: file.size
   });
 
-  const { uploadId, key } = create;
+  const { uploadId, key, bucket } = create as {
+    uploadId: string;
+    key: string;
+    bucket: string;
+  };
 
-  const parts = [];
+  const parts: { PartNumber: number; ETag: string }[] = [];
   let partNumber = 1;
   let start = 0;
 
-  while (start < file.size) {
-    const end = Math.min(start + CHUNK_SIZE, file.size);
-    const blob = file.slice(start, end);
+  try {
+    while (start < file.size) {
+      const end = Math.min(start + CHUNK_SIZE, file.size);
+      const blob = file.slice(start, end);
 
-    const { data: presigned } = await axios.post("/sessions/multipart/presign", {
+      const { data: presigned } = await api.post<{ url: string }>('/upload/multipart/presign-part', {
+        key,
+        uploadId,
+        partNumber
+      });
+
+      const res = await fetch(presigned.url, {
+        method: 'PUT',
+        body: blob
+      });
+      if (!res.ok) throw new Error(`Upload failed for part ${partNumber}`);
+
+      const etag = res.headers.get('ETag')?.replaceAll('"', '');
+      if (!etag) throw new Error(`Missing ETag for part ${partNumber}`);
+      parts.push({ PartNumber: partNumber, ETag: etag });
+
+      start = end;
+      partNumber += 1;
+    }
+
+    await api.post('/upload/multipart/complete', {
       key,
       uploadId,
-      partNumber,
+      parts
     });
 
-    const res = await fetch(presigned.url, {
-      method: "PUT",
-      body: blob,
-    });
-
-    const etag = res.headers.get("ETag")?.replaceAll('"', "");
-    parts.push({ PartNumber: partNumber, ETag: etag });
-
-    start = end;
-    partNumber++;
+    return { bucket, key };
+  } catch (error) {
+    await api.post('/upload/multipart/abort', { key, uploadId }).catch(() => undefined);
+    throw error;
   }
-
-  await axios.post("/sessions/multipart/complete", {
-    key,
-    uploadId,
-    parts,
-  });
 }
