@@ -69,6 +69,8 @@ export default function Sidebar() {
           Campanhas
         </Link>
 
+        <Link to="/live" className="block font-semibold text-amber-300 hover:text-white">Transcrição ao vivo</Link>
+
         {current && (
           <>
             <div className="text-xs uppercase tracking-[0.4em] text-white/60">Campanha ativa</div>
