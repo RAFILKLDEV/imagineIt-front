@@ -7,6 +7,7 @@ import Sessions from './pages/Sessions';
 import Scenarios from './pages/Scenarios';
 import { ToastProvider } from './components/ToastProvider';
 import SessionViewer from './pages/SessionViewer';
+import LiveTranscription from './pages/LiveTranscription';
 
 export default function App(){
   return (
@@ -21,6 +22,7 @@ export default function App(){
               <Route path="/sessions" element={<Sessions/>}/>
               <Route path="/scenarios" element={<Scenarios/>}/>
               <Route path="/sessions/:id" element={<SessionViewer />} />
+              <Route path="/live" element={<LiveTranscription />} />
             </Routes>
           </AppLayout>
         </ToastProvider>
