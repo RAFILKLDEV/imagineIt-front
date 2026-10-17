@@ -3,3 +3,12 @@
 node_modules/
 dist/
 *.zip
+
+# Local configuration and generated dependencies
+.env
+.env.*
+!.env.example
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/*.pyc
