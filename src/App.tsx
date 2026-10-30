@@ -7,6 +7,10 @@ import Sessions from './pages/Sessions';
 import Scenarios from './pages/Scenarios';
 import { ToastProvider } from './components/ToastProvider';
 import SessionViewer from './pages/SessionViewer';
+import CampaignSettings from './pages/CampaignSettings';
+import LiveRecording from './pages/LiveRecording';
+import Benchmarks from './pages/Benchmarks';
+import SessionBenchmark from './pages/SessionBenchmark';
 
 export default function App(){
   return (
@@ -16,6 +20,10 @@ export default function App(){
           <AppLayout>
             <Routes>
               <Route path="/" element={<Campaigns/>}/>
+              <Route path="/campaigns/:id/settings" element={<CampaignSettings/>}/>
+              <Route path="/live" element={<LiveRecording/>}/>
+              <Route path="/benchmarks" element={<Benchmarks/>}/>
+              <Route path="/benchmarks/sessions/:id" element={<SessionBenchmark/>}/>
               <Route path="/characters" element={<Characters/>}/>
               <Route path="/characters/:id" element={<Characters/>}/>
               <Route path="/sessions" element={<Sessions/>}/>

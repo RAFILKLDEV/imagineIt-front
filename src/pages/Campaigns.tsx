@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
 import { useCampaign } from '../context/CampaignContext';
 import { useToast } from '../hooks/useToast';
@@ -90,17 +90,21 @@ export default function Campaigns() {
                 {campaigns.map(c => (
                   <div
                     key={c._id}
-                    className={`flex cursor-pointer items-center justify-between rounded-2xl border px-4 py-3 text-sm text-white transition ${
+                    className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm text-white transition ${
                       current?._id === c._id
                         ? 'border-emerald-500 bg-emerald-500/10'
                         : 'border-white/5 hover:border-white/30'
                     }`}
-                    onClick={() => handleSelect(c._id)}
                   >
-                    <span>{c.nome}</span>
+                    <button type="button" onClick={() => handleSelect(c._id)} className="min-w-0 text-left hover:text-emerald-300">
+                      {c.nome}<small className="block break-all text-xs text-white/50">ID para /campanha sincronizar: {c._id}</small>
+                    </button>
                     {current?._id === c._id && (
                       <span className="text-xs uppercase tracking-[0.3em] text-emerald-300">Ativa</span>
                     )}
+                    <Link to={`/campaigns/${c._id}/settings`} className="rounded-xl border border-white/20 px-3 py-2 text-xs hover:border-emerald-400 hover:text-emerald-300" aria-label={`Configurações de ${c.nome}`}>
+                      Configurações
+                    </Link>
                   </div>
                 ))}
               </div>

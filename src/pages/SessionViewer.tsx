@@ -1,118 +1,43 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { api } from "../services/api"
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { api } from '../services/api';
+import type { Session } from '../types/transcription';
 
-interface Segment {
-    speaker?: string
-    text: string
-    block_id?: number
-}
-
-interface SessionData {
-    id?: string
-    _id?: string
-    transcription?: {
-        segments?: Segment[]
-        notes?: string
-    }
-}
-
-interface Block {
-    block_id: number
-    speeches: Record<string, string[]>
-}
+import { SessionTranscript } from '../components/SessionTranscript';
+import { QualityPanel } from '../components/QualityPanel';
 
 export default function SessionViewer() {
-    const { id } = useParams()
-    const [session, setSession] = useState<SessionData | null>(null)
-    const [blocks, setBlocks] = useState<Block[]>([])
+  const { id } = useParams();
+  const [session, setSession] = useState<Session | null>(null);
+  const [error, setError] = useState('');
+  const [preview, setPreview] = useState<Session | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewError, setPreviewError] = useState('');
 
-    useEffect(() => {
-        async function load() {
-            const { data } = await api.get(`/sessions/${id}`)
-            setSession(data)
-
-            const segments = Array.isArray(data?.transcription?.segments)
-                ? data.transcription.segments
-                : []
-
-            buildBlocks(segments)
-        }
-
-        load()
-    }, [id])
-
-    function buildBlocks(segments: Segment[]) {
-        const result: Block[] = []
-
-        let currentBlock: Block | null = null
-        let lastSpeaker: string | null = null
-
-        segments.forEach((seg, index) => {
-            const speaker = seg.speaker || "Desconhecido"
-
-            // mesmo falante → acumula
-            if (currentBlock && speaker === lastSpeaker) {
-                currentBlock.speeches[speaker].push(seg.text)
-                return
-            }
-
-            // novo falante → novo bloco
-            currentBlock = {
-                block_id: index,
-                speeches: {
-                    [speaker]: [seg.text]
-                }
-            }
-
-            result.push(currentBlock)
-            lastSpeaker = speaker
-        })
-
-        setBlocks(result)
+  useEffect(() => {
+    let disposed = false;
+    async function load() {
+      try {
+        const { data } = await api.get<Session>(`/sessions/${id}`);
+        if (!disposed) { setSession(data); setError(''); }
+      } catch { if (!disposed) setError('Nao foi possivel carregar a sessao. Confira a API e tente novamente.'); }
     }
+    load();
+    const timer = window.setInterval(load, 5000);
+    return () => { disposed = true; window.clearInterval(timer); };
+  }, [id]);
+  useEffect(() => { setPreview(null); setShowPreview(false); setPreviewError(''); }, [id]);
+  async function openPreview() {
+    setShowPreview(true);
+    try {
+      const { data } = await api.get(`/quality/sessions/${id}/preview`);
+      setPreview({ ...session, titulo: `${session?.titulo || 'Sessão'} — prévia ao vivo`, transcription: { status: 'completed', sourceMode: 'discord_multitrack',
+        items: data.messages.map((m: any) => ({ entryId: m.chunkId, userId: m.userId, speaker: m.speaker, text: m.text || '', rawText: m.rawText, startMs: m.startMs, endMs: m.startMs + m.durationMs, warnings: m.warnings, reviewRequired: m.qualityState === 'review_required' })) } });
+      setPreviewError(data.messages.length ? '' : 'Esta sessão não possui prévia ao vivo preservada.');
+    } catch { setPreviewError('Não foi possível carregar a prévia ao vivo.'); }
+  }
 
-    console.log(session)
-
-
-    if (!session) return <p>Carregando sessão...</p>
-
-    return (
-        <div style={{ padding: 24 }}>
-            <h2>Sessão</h2>
-
-            {blocks.length === 0 && (
-                <p style={{ opacity: 0.6 }}>Esta sessão ainda não possui transcrição.</p>
-            )}
-
-            {blocks.map(block => (
-                <div
-                    key={block.block_id}
-                    style={{
-                        border: "1px solid #333",
-                        borderRadius: 8,
-                        padding: 16,
-                        marginBottom: 24
-                    }}
-                >
-                    {Object.entries(block.speeches).map(([speaker, texts]) => (
-                        <div key={speaker} style={{ marginBottom: 12 }}>
-                            <strong>{speaker}</strong>
-                            <p style={{ whiteSpace: "pre-line", marginTop: 4 }}>
-                                {texts.join(" ")}
-                            </p>
-                        </div>
-                    ))}
-
-                    {session.transcription?.notes && (
-                        <>
-                            <hr />
-                            <strong>Nota da Transcrição</strong>
-                            <p>{session.transcription.notes}</p>
-                        </>
-                    )}
-                </div>
-            ))}
-        </div>
-    )
+  return <div className="space-y-6">
+    <Link to={`/benchmarks/sessions/${id}`} className="inline-block rounded-xl border border-emerald-400/40 px-4 py-3 text-emerald-300">Avaliar transcrição sem reenviar áudio</Link>
+    <div className="flex gap-3 text-sm"><button type="button" className={`rounded-xl border px-4 py-2 ${!showPreview ? 'border-emerald-400 text-emerald-300' : 'border-white/20 text-white/60'}`} onClick={() => setShowPreview(false)}>Versão final</button><button type="button" className={`rounded-xl border px-4 py-2 ${showPreview ? 'border-emerald-400 text-emerald-300' : 'border-white/20 text-white/60'}`} onClick={openPreview}>Prévia ao vivo preservada</button></div>{showPreview && <p className="text-xs text-white/50">Mostrando até 500 falas da prévia; a versão final é mantida separadamente.</p>}<SessionTranscript session={showPreview ? preview : session} error={showPreview ? previewError : error} />{id && <QualityPanel sessionId={id} />}</div>;
 }

@@ -73,8 +73,13 @@ export default function Sidebar() {
           <>
             <div className="text-xs uppercase tracking-[0.4em] text-white/60">Campanha ativa</div>
             <div className="font-semibold text-amber-400 truncate">{current.nome}</div>
+            <Link to={`/campaigns/${current._id}/settings`} className="block rounded-xl border border-white/20 px-3 py-2 text-sm text-white hover:border-emerald-400 hover:text-emerald-300">
+              Configurações da campanha
+            </Link>
 
             <div className="space-y-2 text-[11px] uppercase tracking-[0.5em] text-white/40">
+              <Link to="/live" className="block text-emerald-300 hover:text-emerald-200">Ao vivo</Link>
+              <Link to="/benchmarks" className="block hover:text-emerald-200">Benchmarks</Link>
               <Link to="/characters" className="block hover:text-amber-200">
                 Personagens
               </Link>
