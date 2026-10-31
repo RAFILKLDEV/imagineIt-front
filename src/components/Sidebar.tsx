@@ -1,139 +1,82 @@
-import { Link } from "react-router-dom";
-import { useCampaign } from "../context/CampaignContext";
-import { useEffect, useState } from "react";
-import { api } from "../services/api";
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useCampaign } from '../context/CampaignContext';
+import { api } from '../services/api';
 
-type Character = {
-  _id: string;
-  nome: string;
-  tipo: string;
-};
-
-type Scenario = {
-  _id: string;
-  nome: string;
-  tipo?: string;
-  updatedAt?: string;
-};
-
+type Entry = { _id: string; nome: string; tipo?: string };
+function Glyph({ name }: { name: string }) {
+  const paths: Record<string, string> = {
+    home: 'M3 10.5 12 3l9 7.5V21h-7v-7h-4v7H3z',
+    campaign: 'M4 5h16v14H4z M8 5v14 M12 8h5 M12 12h5',
+    sessions: 'M4 6h16 M4 11h16 M4 16h12 M4 20h9',
+    audio: 'M3 12h2l2-5 4 10 3-14 3 9h4',
+    people: 'M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8 M18 8a3 3 0 0 1 0 6 M20 20v-2a4 4 0 0 0-3-3.87',
+    map: 'm3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15',
+    settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6 M4 12l2-1 .5-2L5 7l2-2 2 1.5 2-.5 1-2h3l1 2 2 .5L20 5l2 2-1.5 2 .5 2 2 1v2l-2 1-.5 2L22 19l-2 2-2-1.5-2 .5-1 2h-3l-1-2-2-.5L7 21l-2-2 1.5-2-.5-2-2-1z',
+    lab: 'M9 3h6 M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3 M8 16h8',
+    chevron: 'm7 10 5 5 5-5',
+    fold: 'M15 18 9 12l6-6',
+    menu: 'M3 6h18 M3 12h18 M3 18h18',
+    close: 'M5 5l14 14 M19 5 5 19'
+  };
+  return <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name] || paths.home} /></svg>;
+}
 export default function Sidebar() {
-  const { current } = useCampaign();
-  const [characters, setCharacters] = useState<Character[]>([]);
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
-
-  const loadCharacters = () => {
-    if (!current) {
-      setCharacters([]);
-      return;
-    }
-    api.get(`/characters?campanhaId=${current._id}`).then(res => setCharacters(res.data));
-  };
-
-  const loadScenarios = () => {
-    if (!current) {
-      setScenarios([]);
-      return;
-    }
-    api.get(`/scenarios?campanhaId=${current._id}`).then(res => setScenarios(res.data));
-  };
-
+  const { campaigns, current, setCurrentById } = useCampaign();
+  const [characters, setCharacters] = useState<Entry[]>([]);
+  const [scenarios, setScenarios] = useState<Entry[]>([]);
+  const [compact, setCompact] = useState(() => typeof window !== 'undefined' && window.localStorage.getItem('imagine:compact') === 'true');
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
+  useEffect(() => { setOpen(false); }, [location.pathname]);
   useEffect(() => {
-    loadCharacters();
-    loadScenarios();
-  }, [current]);
-
-  useEffect(() => {
-    const handler = () => {
-      loadCharacters();
-      loadScenarios();
+    let alive = true;
+    setCharacters([]); setScenarios([]);
+    if (!current) return;
+    Promise.allSettled([
+      api.get<Entry[]>('/characters', { params: { campanhaId: current._id } }),
+      api.get<Entry[]>('/scenarios', { params: { campanhaId: current._id } })
+    ]).then(results => {
+      if (!alive) return;
+      if (results[0].status === 'fulfilled') setCharacters(results[0].value.data);
+      if (results[1].status === 'fulfilled') setScenarios(results[1].value.data);
+    });
+    const refresh = () => {
+      api.get<Entry[]>('/characters', { params: { campanhaId: current._id } }).then(r => { if (alive) setCharacters(r.data); }).catch(() => {});
+      api.get<Entry[]>('/scenarios', { params: { campanhaId: current._id } }).then(r => { if (alive) setScenarios(r.data); }).catch(() => {});
     };
-
-    window.addEventListener('charactersUpdated', handler);
-    window.addEventListener('scenariosUpdated', handler);
-    return () => {
-      window.removeEventListener('charactersUpdated', handler);
-      window.removeEventListener('scenariosUpdated', handler);
-    };
-  }, [current]);
-
-  const grouped = characters.reduce<Record<string, Character[]>>((acc, char) => {
-    acc[char.tipo] = acc[char.tipo] || [];
-    acc[char.tipo].push(char);
-    return acc;
-  }, {});
-
-  return (
-    <aside className="w-64 bg-zinc-900 text-zinc-100 p-4 overflow-y-auto border-r border-black/40">
-      <nav className="space-y-4 text-sm">
-        <Link to="/" className="block font-semibold text-white hover:text-amber-300">
-          Campanhas
-        </Link>
-
-        {current && (
-          <>
-            <div className="text-xs uppercase tracking-[0.4em] text-white/60">Campanha ativa</div>
-            <div className="font-semibold text-amber-400 truncate">{current.nome}</div>
-            <Link to={`/campaigns/${current._id}/settings`} className="block rounded-xl border border-white/20 px-3 py-2 text-sm text-white hover:border-emerald-400 hover:text-emerald-300">
-              Configurações da campanha
-            </Link>
-
-            <div className="space-y-2 text-[11px] uppercase tracking-[0.5em] text-white/40">
-              <Link to="/live" className="block text-emerald-300 hover:text-emerald-200">Ao vivo</Link>
-              <Link to="/benchmarks" className="block hover:text-emerald-200">Benchmarks</Link>
-              <Link to="/characters" className="block hover:text-amber-200">
-                Personagens
-              </Link>
-              <Link to="/sessions" className="block hover:text-amber-200">
-                Sessões
-              </Link>
-              <Link to="/scenarios" className="block hover:text-amber-200">
-                Cenários
-              </Link>
-            </div>
-
-            <div className="space-y-2 border-t border-white/10 pt-3">
-              <div className="text-[10px] uppercase tracking-[0.4em] text-zinc-500">Personagens</div>
-              {Object.entries(grouped).map(([tipo, chars]) => (
-                <div key={tipo}>
-                  <div className="text-zinc-400 capitalize text-[11px]">• {tipo}</div>
-                  <div className="space-y-1 pl-3">
-                    {chars.map(c => (
-                      <Link
-                        key={c._id}
-                        to={`/characters/${c._id}`}
-                        className="block text-[12px] hover:text-amber-200 truncate"
-                      >
-                        {c.nome}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {!characters.length && (
-                <div className="text-zinc-500 text-xs">Sem personagens</div>
-              )}
-            </div>
-
-            <div className="border-t border-white/10 pt-3 text-[10px] uppercase tracking-[0.4em] text-zinc-500">
-              Cenários recentes
-            </div>
-            <div className="space-y-1 pl-2 text-[12px]">
-              {scenarios.slice(0, 5).map(scenario => (
-                <Link
-                  key={scenario._id}
-                  to="/scenarios"
-                  className="block hover:text-amber-200 truncate"
-                >
-                  {scenario.nome}
-                </Link>
-              ))}
-              {!scenarios.length && (
-                <div className="text-zinc-500 text-xs">Nenhum cenário</div>
-              )}
-            </div>
-          </>
-        )}
+    window.addEventListener('charactersUpdated', refresh);
+    window.addEventListener('scenariosUpdated', refresh);
+    return () => { alive = false; window.removeEventListener('charactersUpdated', refresh); window.removeEventListener('scenariosUpdated', refresh); };
+  }, [current?._id]);
+  const nav = (to: string, title: string, icon: string, enabled = true) => enabled ? <NavLink key={to} to={to} end={to === '/' || to === '/campaigns'} title={compact ? title : undefined} className={({ isActive }) => 'it-nav-link' + (isActive ? ' it-nav-link--active' : '')}><Glyph name={icon}/>{!compact && <span>{title}</span>}</NavLink> : null;
+  const toggle = () => { const next = !compact; setCompact(next); window.localStorage.setItem('imagine:compact', String(next)); };
+  return <>
+    <button type="button" className="it-menu-trigger" aria-label={open ? 'Fechar menu' : 'Abrir menu'} aria-expanded={open} onClick={() => setOpen(!open)}><Glyph name={open ? 'close' : 'menu'}/></button>
+    <div className={'it-overlay' + (open ? ' it-overlay--open' : '')} onClick={() => setOpen(false)} aria-hidden="true" />
+    <aside className={'it-side' + (compact ? ' it-side--compact' : '') + (open ? ' it-side--open' : '')} aria-label="Navegação principal">
+      <Link className="it-side-logo" to="/dashboard" title="Imagine it"><span className="it-brand-mark"><svg width="26" height="26" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="currentColor" strokeOpacity=".5"/><path d="m14 3 4 11-4 11-4-11 4-11Z" stroke="currentColor"/><circle cx="14" cy="14" r="2" fill="currentColor"/></svg></span>{!compact && <span className="text-base font-bold tracking-tight">Imagine <span style={{ color: '#A99AFF' }}>it</span><small className="block text-[9px] font-medium uppercase tracking-[.27em] text-[#747989]">Campaign intelligence</small></span>}</Link>
+      {!compact && <div className="it-side-campaign"><div className="text-[10px] font-semibold uppercase tracking-[.13em] text-[#858A9A]">Campanha ativa</div><select aria-label="Selecionar campanha" value={current?._id || ''} onChange={e => setCurrentById(e.target.value)}><option value="" disabled>{campaigns.length ? 'Selecione uma campanha' : 'Nenhuma campanha'}</option>{campaigns.map(c => <option key={c._id} value={c._id}>{c.nome}</option>)}</select></div>}
+      <nav className="it-side-scroll">
+        {!compact && <p className="it-side-group">Principal</p>}
+        {nav('/dashboard', 'Visão geral', 'home')}
+        {nav('/', 'Campanhas', 'campaign')}
+        {nav('/sessions', 'Sessões', 'sessions', Boolean(current))}
+        {nav('/live', 'Ao vivo', 'audio', Boolean(current))}
+        {current && <>
+          {!compact && <p className="it-side-group">Campanha selecionada</p>}
+          {nav('/characters', 'Personagens', 'people')}
+          {nav('/scenarios', 'Cenários', 'map')}
+          {nav('/campaigns/' + current._id + '/settings', 'Configurações', 'settings')}
+          {!compact && <div className="it-side-details">
+            <details><summary>Personagens recentes <Glyph name="chevron" /></summary>{characters.slice(0, 5).map(c => <Link key={c._id} to={'/characters/' + c._id}>{c.nome}</Link>)}{!characters.length && <span className="block px-3 py-2 text-xs text-[#747989]">Nenhum personagem</span>}</details>
+            <details><summary>Cenários recentes <Glyph name="chevron" /></summary>{scenarios.slice(0, 5).map(s => <Link key={s._id} to="/scenarios">{s.nome}</Link>)}{!scenarios.length && <span className="block px-3 py-2 text-xs text-[#747989]">Nenhum cenário</span>}</details>
+          </div>}
+        </>}
+        {!compact && <p className="it-side-group">Ferramentas</p>}
+        {nav('/benchmarks', 'Benchmarks', 'lab')}
       </nav>
+      <div className="it-side-bottom"><button type="button" className="it-collapse" onClick={toggle} aria-label={compact ? 'Expandir menu' : 'Recolher menu'}><Glyph name="fold"/>{!compact && <span>Recolher menu</span>}</button></div>
     </aside>
-  );
+  </>;
 }
