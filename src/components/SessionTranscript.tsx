@@ -35,7 +35,7 @@ export function SessionTranscript({session,error=''}: {session:Session|null;erro
     session.transcription?.warnings?.includes('simulated_development_response');
 
   return (
-    <div className="min-h-screen bg-[#07101f] p-6 text-white">
+    <div className="imagine-page text-white">
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="space-y-2">
           <p className="text-xs uppercase tracking-[0.3em] text-cyan-200">Sessao</p>
@@ -55,7 +55,7 @@ export function SessionTranscript({session,error=''}: {session:Session|null;erro
 
         <div className="space-y-3">
           {transcriptItems.map((item, index) => (
-            <article key={`${item.entryId || index}-${item.startMs || 0}`} className="rounded-lg border border-white/10 bg-white/[0.04] p-4">
+            <article key={`${item.entryId || index}-${item.startMs || 0}`} className="it-panel p-5 transition-colors hover:border-[#49425D]">
               <div className="flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.2em] text-white/50">
                 <span className="text-cyan-200">{item.speaker || item.discordNick || item.userId || 'Desconhecido'}</span>
                 <span>{formatTime(undefined, item.startMs)} - {formatTime(undefined, item.endMs)}</span>
