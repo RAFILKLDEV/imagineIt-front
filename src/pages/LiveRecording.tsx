@@ -89,7 +89,7 @@ export default function LiveRecording() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#161c33] to-[#050816] p-6 sm:p-10">
+    <div className="imagine-page">
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="rounded-[32px] bg-[#050916] p-8">
           <p className="text-xs uppercase tracking-[0.3em] text-emerald-300">{current?.nome || 'Selecione uma campanha'}</p>
