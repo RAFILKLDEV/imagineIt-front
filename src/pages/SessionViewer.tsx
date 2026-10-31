@@ -37,7 +37,7 @@ export default function SessionViewer() {
     } catch { setPreviewError('Não foi possível carregar a prévia ao vivo.'); }
   }
 
-  return <div className="space-y-6">
+  return <div className="imagine-page space-y-6">
     <Link to={`/benchmarks/sessions/${id}`} className="inline-block rounded-xl border border-emerald-400/40 px-4 py-3 text-emerald-300">Avaliar transcrição sem reenviar áudio</Link>
     <div className="flex gap-3 text-sm"><button type="button" className={`rounded-xl border px-4 py-2 ${!showPreview ? 'border-emerald-400 text-emerald-300' : 'border-white/20 text-white/60'}`} onClick={() => setShowPreview(false)}>Versão final</button><button type="button" className={`rounded-xl border px-4 py-2 ${showPreview ? 'border-emerald-400 text-emerald-300' : 'border-white/20 text-white/60'}`} onClick={openPreview}>Prévia ao vivo preservada</button></div>{showPreview && <p className="text-xs text-white/50">Mostrando até 500 falas da prévia; a versão final é mantida separadamente.</p>}<SessionTranscript session={showPreview ? preview : session} error={showPreview ? previewError : error} />{id && <QualityPanel sessionId={id} />}</div>;
 }
