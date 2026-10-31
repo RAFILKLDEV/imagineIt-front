@@ -230,7 +230,7 @@ export default function Scenarios() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#12182c] to-[#03070f] p-6 sm:p-10">
+    <div className="imagine-page">
       <div className="mx-auto max-w-6xl space-y-6">
         <section className="rounded-[36px] bg-[#050916] p-8 shadow-[0_30px_70px_rgba(3,7,18,0.8)]">
           <div className="flex items-center justify-between">
