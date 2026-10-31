@@ -29,7 +29,7 @@ export default function Campaigns() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#161c33] to-[#050816] p-6 sm:p-10">
+    <div className="imagine-page">
       <div className="mx-auto max-w-5xl space-y-6">
         <section className="rounded-[36px] bg-[#050916] p-8 shadow-[0_30px_70px_rgba(3,7,18,0.8)]">
           <div className="flex items-center justify-between">
