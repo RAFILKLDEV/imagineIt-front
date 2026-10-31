@@ -83,7 +83,7 @@ export default function CampaignSettings() {
 
   const ready = form && loadedId === id;
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#161c33] to-[#050816] p-6 sm:p-10">
+    <div className="imagine-page">
       <div className="mx-auto max-w-4xl space-y-6">
         <header className="rounded-[36px] bg-[#050916] p-8">
           <Link to="/" className="text-sm text-emerald-300 hover:underline">← Voltar para campanhas</Link>
