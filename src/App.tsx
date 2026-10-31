@@ -1,3 +1,4 @@
+import Dashboard from './pages/Dashboard';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AppLayout from './layout/AppLayout';
 import { CampaignProvider } from './context/CampaignContext';
@@ -20,6 +21,7 @@ export default function App(){
           <AppLayout>
             <Routes>
               <Route path="/" element={<Campaigns/>}/>
+              <Route path="/dashboard" element={<Dashboard/>}/>
               <Route path="/campaigns/:id/settings" element={<CampaignSettings/>}/>
               <Route path="/live" element={<LiveRecording/>}/>
               <Route path="/benchmarks" element={<Benchmarks/>}/>
