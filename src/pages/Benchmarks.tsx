@@ -65,8 +65,8 @@ export default function Benchmarks() {
   }
   const latest = runs[0];
   const resultRows: any[] = latest?.results || [];
-  return <div className="mx-auto max-w-6xl space-y-6 p-4 text-white">
-    <header className="rounded-[28px] bg-[#0c1223] p-8"><Link to="/live" className="text-sm text-emerald-300">← Ao vivo</Link><h1 className="mt-4 text-3xl font-semibold">Benchmarks</h1><p className="mt-3 text-sm text-white/60">{current?.nome || 'Selecione uma campanha'} · Compare os mesmos áudios entre modelos. Corrija 2–3 minutos de fala para começar a medir a precisão.</p></header>
+  return <div className="imagine-page mx-auto max-w-6xl space-y-6 text-white">
+    <header className="it-panel it-glow it-grid-texture p-8"><Link to="/live" className="text-sm text-emerald-300">← Ao vivo</Link><h1 className="mt-4 text-3xl font-semibold">Benchmarks</h1><p className="mt-3 text-sm text-white/60">{current?.nome || 'Selecione uma campanha'} · Compare os mesmos áudios entre modelos. Corrija 2–3 minutos de fala para começar a medir a precisão.</p></header>
     {!current && <Link to="/" className="text-emerald-300 underline">Selecionar campanha</Link>}
     {recordingId.startsWith('final:') && <section className="space-y-3 rounded-[28px] border border-emerald-400/30 bg-[#0c1223] p-6"><h2 className="text-xl font-semibold">Usar a transcrição desta sessão</h2><p className="text-sm text-white/60">Ouça trechos e compare o texto já salvo com referências corrigidas, sem novas chamadas ao Groq.</p><Link className="inline-block rounded-xl bg-emerald-500 px-4 py-3 text-sm" to={`/benchmarks/sessions/${recordingId.slice(6)}`}>Avaliar transcrição salva</Link></section>}
     {error && <p role="alert" className="rounded-xl bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}{notice && <p role="status" className="rounded-xl bg-emerald-500/10 p-4 text-sm text-emerald-200">{notice}</p>}

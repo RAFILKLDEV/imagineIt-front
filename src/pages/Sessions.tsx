@@ -127,6 +127,8 @@ export default function Sessions() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [audioChoicesDraft, setAudioChoicesDraft] = useState<{ sessionId: string; participants: AudioParticipantChoice[] } | null>(null);
+  const [sessionQuery, setSessionQuery] = useState('');
+  const [sessionFilter, setSessionFilter] = useState<'all' | 'transcribed' | 'pending'>('all');
   const [activeJob, setActiveJob] = useState<TranscriptionJob | null>(null);
   const [transcriptionResult, setTranscriptionResult] = useState<SessionTranscription | null>(null);
   const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
@@ -577,6 +579,20 @@ export default function Sessions() {
   }
   const environmentSummary = `${form.cenariosVisitados.length} cenarios - ${form.personagensPresentes.length} personagens`;
 
+  const filteredItems = useMemo(() => {
+    const query = sessionQuery.trim().toLocaleLowerCase();
+    return items.filter(session => {
+      const title = String(session.titulo || '').toLocaleLowerCase();
+      const number = String(session.numero || '').toLocaleLowerCase();
+      const matchesQuery = !query || title.includes(query) || number.includes(query);
+      const status = session.transcription?.status;
+      const matchesFilter = sessionFilter === 'all'
+        || (sessionFilter === 'transcribed' && status === 'completed')
+        || (sessionFilter === 'pending' && status !== 'completed');
+      return matchesQuery && matchesFilter;
+    });
+  }, [items, sessionFilter, sessionQuery]);
+
   const handleDragStart = (sessionId: string) => setDraggedSessionId(sessionId);
   const handleDragOver = (event: DragEvent<HTMLButtonElement>, sessionId: string) => {
     event.preventDefault();
@@ -591,30 +607,28 @@ export default function Sessions() {
 
   return (
     <div className="imagine-page">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <section className="rounded-[36px] bg-[#050916] p-8 shadow-[0_30px_70px_rgba(3,7,18,0.8)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-white/60">
-              <span className="h-2 w-2 rounded-full bg-cyan-400" />
-              Sessoes
+      <div className="mx-auto max-w-[1480px] space-y-6">
+        <header className="sessions-hero it-panel it-glow it-grid-texture relative overflow-hidden p-6 sm:p-8">
+          <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
+            <div>
+              <p className="it-eyebrow">Arquivo de campanha / Sessões</p>
+              <h1 className="it-heading mt-2 text-3xl font-semibold sm:text-4xl">Organize cada capítulo</h1>
+              <p className="it-muted mt-3 max-w-2xl text-sm leading-6">Registre a sessão, prepare os áudios e acompanhe o estado da transcrição em um único espaço de trabalho.</p>
             </div>
-            <button
-              type="button"
-              className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 text-xs font-semibold uppercase text-white shadow-lg shadow-cyan-900/30 transition hover:opacity-90"
-              onClick={() => setSelected(null)}
-            >
-              Criar sessao
+            <button type="button" className="it-primary" onClick={() => setSelected(null)}>
+              <span aria-hidden="true">＋</span> Nova sessão
             </button>
           </div>
-          <h1 className="mt-6 text-3xl font-semibold text-white">Documente cada sessao</h1>
-          <p className="mt-2 text-sm text-white/60">
-            Registre titulos, numero, cenario, personagens, audio e transcricao gerenciada pelo backend.
-          </p>
-        </section>
+          <div className="relative z-10 mt-7 flex flex-wrap gap-2 text-xs">
+            <span className="it-status"><span className="it-status-dot" /> {items.length} sessões no arquivo</span>
+            <span className="it-status"><span className="it-status-dot" /> {items.filter(item => item.transcription?.status === 'completed').length} transcritas</span>
+            {current && <span className="it-status">Campanha: {current.nome}</span>}
+          </div>
+        </header>
 
-        <section className="rounded-[40px] bg-[#0c1223] p-6 shadow-[0_20px_60px_rgba(5,5,20,0.8)]">
-          <div className="grid gap-8 lg:grid-cols-[1.8fr,1fr]">
-            <div className="space-y-6 rounded-[30px] border border-white/5 bg-gradient-to-br from-white/5 to-white/0 p-6 shadow-inner">
+        <section className="sessions-workspace it-panel p-4 sm:p-6">
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.6fr)_380px]">
+            <div className="sessions-editor it-panel-raised space-y-6 p-5 sm:p-7">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="text-xs uppercase tracking-[0.3em] text-white/60">
                   Titulo
@@ -813,15 +827,32 @@ export default function Sessions() {
               )}
             </div>
 
-            <div className="space-y-6 rounded-[30px] border border-white/5 bg-[#0c1021] p-6">
+            <aside className="sessions-library it-panel space-y-4 p-4 sm:p-5">
               {selected && getSessionId(selected) && <QualityPanel sessionId={getSessionId(selected)!} />}
-              <div className="space-y-2 text-white">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">Sessoes salvas</p>
-                <p className="text-sm text-white/60">Selecione uma sessao para carregar seus dados.</p>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="it-eyebrow">Arquivo</p>
+                  <h2 className="mt-1 text-lg font-semibold">Suas sessões</h2>
+                </div>
+                <span className="sessions-count">{filteredItems.length}</span>
               </div>
-              <div className="max-h-[420px] space-y-3 overflow-y-auto">
-                {items.map((session, index) => {
+              <label className="sessions-search" aria-label="Buscar sessão">
+                <span aria-hidden="true">⌕</span>
+                <input value={sessionQuery} onChange={event => setSessionQuery(event.target.value)} placeholder="Buscar por título ou número" />
+                {sessionQuery && <button type="button" onClick={() => setSessionQuery('')} aria-label="Limpar busca">×</button>}
+              </label>
+              <div className="sessions-filters" role="tablist" aria-label="Filtrar sessões">
+                {([['all', 'Todas'], ['pending', 'Em preparo'], ['transcribed', 'Transcritas']] as const).map(([value, label]) => (
+                  <button key={value} type="button" role="tab" aria-selected={sessionFilter === value} className={sessionFilter === value ? 'is-active' : ''} onClick={() => setSessionFilter(value)}>{label}</button>
+                ))}
+              </div>
+              <p className="sessions-drag-hint">Arraste para reordenar o arquivo</p>
+              <div className="sessions-list" aria-live="polite">
+                {filteredItems.length === 0 && <div className="sessions-empty"><span className="sessions-empty-icon">✦</span><p>Nenhuma sessão encontrada</p><span>Ajuste a busca ou crie um novo capítulo.</span></div>}
+                {filteredItems.map((session, index) => {
                   const sessionId = getSessionId(session) ?? `session-${index}`;
+                  const isActive = getSessionId(selected) === sessionId;
+                  const isDone = session.transcription?.status === 'completed';
                   return (
                     <button
                       key={sessionId}
@@ -831,25 +862,19 @@ export default function Sessions() {
                       onDragOver={event => handleDragOver(event, sessionId)}
                       onDrop={event => handleDrop(event, sessionId)}
                       onDragLeave={() => setDragOverSessionId(null)}
-                      onDragEnd={() => {
-                        setDraggedSessionId(null);
-                        setDragOverSessionId(null);
-                      }}
-                      className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm text-white transition ${getSessionId(selected) === sessionId ? 'border-cyan-500 bg-cyan-500/10' : 'border-white/10 hover:border-white/30'} ${dragOverSessionId === sessionId ? 'border-white/70 bg-white/5' : ''}`}
+                      onDragEnd={() => { setDraggedSessionId(null); setDragOverSessionId(null); }}
                       onClick={() => setSelected(session)}
+                      className={`session-row ${isActive ? 'is-active' : ''} ${dragOverSessionId === sessionId ? 'is-drag-target' : ''}`}
                     >
-                      <div>
-                        <p className="font-semibold">{session.titulo || 'Sessao sem nome'}</p>
-                        <p className="text-xs text-white/50">#{session.numero || '-'}</p>
-                      </div>
-                      <span className="text-xs uppercase tracking-[0.3em] text-cyan-300">
-                        {session.personagensPresentes?.length || 0} presentes
-                      </span>
+                      <span className="session-row-grip" aria-hidden="true">⋮⋮</span>
+                      <span className="session-row-number">{String(session.numero || index + 1).padStart(2, '0')}</span>
+                      <span className="session-row-main"><strong>{session.titulo || 'Sessão sem nome'}</strong><small>{session.personagensPresentes?.length || 0} personagens · {session.cenariosVisitados?.length || 0} cenários</small></span>
+                      <span className={`session-row-status ${isDone ? 'is-done' : ''}`} title={isDone ? 'Transcrição concluída' : 'Aguardando transcrição'}>{isDone ? '✓' : '•'}</span>
                     </button>
                   );
                 })}
               </div>
-            </div>
+            </aside>
           </div>
         </section>
       </div>

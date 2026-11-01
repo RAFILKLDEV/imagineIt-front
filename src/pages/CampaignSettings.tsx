@@ -85,7 +85,7 @@ export default function CampaignSettings() {
   return (
     <div className="imagine-page">
       <div className="mx-auto max-w-4xl space-y-6">
-        <header className="rounded-[36px] bg-[#050916] p-8">
+        <header className="it-panel it-glow it-grid-texture p-8">
           <Link to="/" className="text-sm text-emerald-300 hover:underline">← Voltar para campanhas</Link>
           <h1 className="mt-5 text-3xl font-semibold text-white">Configurações da campanha</h1>
           <p className="mt-2 text-sm text-white/60">{ready ? form.nome : 'Gerencie os dados da campanha e a conexão com o gravador Discord.'}</p>
@@ -93,7 +93,7 @@ export default function CampaignSettings() {
         {error && <p role="alert" className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
         {!ready && !error && <p role="status" className="text-white/60">Carregando configurações...</p>}
         {ready && <>
-          <form onSubmit={save} className="space-y-6 rounded-[32px] border border-white/5 bg-[#0c1223] p-6 sm:p-8">
+          <form onSubmit={save} className="it-panel space-y-6 p-6 sm:p-8">
             <fieldset disabled={saving} className="space-y-5 disabled:opacity-60">
               <legend className="mb-5 text-lg font-semibold text-white">Dados da campanha</legend>
               <label className="block text-sm text-white/70">Nome da campanha
@@ -133,7 +133,7 @@ export default function CampaignSettings() {
               {saving ? 'Salvando...' : 'Salvar configurações'}
             </button>
           </form>
-          <section className="space-y-4 rounded-[32px] border border-white/5 bg-[#0c1223] p-6 sm:p-8">
+          <section className="it-panel space-y-4 p-6 sm:p-8">
             <h2 className="text-lg font-semibold text-white">Gravação no Discord</h2>
             <Link to="/live" onClick={() => setCurrentById(id!)} className="inline-block rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white">Abrir transcrição ao vivo</Link>
             <p className="text-sm text-white/60">Com o bot online, execute este comando no servidor para vincular as próximas gravações a esta campanha.</p>

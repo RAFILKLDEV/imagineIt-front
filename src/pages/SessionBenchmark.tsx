@@ -75,8 +75,8 @@ export default function SessionBenchmark() {
   const characters = rows.reduce((sum, row) => sum + row.referenceCharacters, 0);
   const wer = words ? rows.reduce((sum, row) => sum + row.errors, 0) / words : null;
   const cer = characters ? rows.reduce((sum, row) => sum + row.characterErrors, 0) / characters : null;
-  return <div className="mx-auto max-w-6xl space-y-6 p-4 text-white">
-    <header className="space-y-3 rounded-[28px] bg-[#0c1223] p-8">
+  return <div className="imagine-page mx-auto max-w-6xl space-y-6 text-white">
+    <header className="it-panel it-glow it-grid-texture space-y-3 p-8">
       <Link to={`/sessions/${id}`} className="text-sm text-emerald-300">← Voltar à transcrição</Link>
       <h1 className="text-3xl font-semibold">Avaliar transcrição salva</h1>
       <p className="text-white/70">{data?.title || 'Carregando sessão...'}</p>

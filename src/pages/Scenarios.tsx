@@ -232,7 +232,7 @@ export default function Scenarios() {
   return (
     <div className="imagine-page">
       <div className="mx-auto max-w-6xl space-y-6">
-        <section className="rounded-[36px] bg-[#050916] p-8 shadow-[0_30px_70px_rgba(3,7,18,0.8)]">
+        <section className="it-panel it-glow it-grid-texture p-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-white/60">
               <span className="h-2 w-2 rounded-full bg-amber-400" />
@@ -252,7 +252,7 @@ export default function Scenarios() {
           </p>
         </section>
 
-        <section className="rounded-[40px] bg-[#0c1223] p-6 shadow-[0_20px_60px_rgba(5,5,20,0.8)]">
+        <section className="it-panel p-6">
           <div className="grid gap-8 lg:grid-cols-[1.8fr,1fr]">
             <div className="space-y-6 rounded-[30px] border border-white/5 bg-gradient-to-br from-white/5 to-white/0 p-6 shadow-inner">
               <div className="grid gap-4 md:grid-cols-2">
