@@ -12,3 +12,7 @@ test('upload errors stay readable for failed PUTs, disconnected server and non-J
   assert.match(getApiErrorMessage({isAxiosError:true},'Falha no envio.'),/conexao/);
   assert.equal(getApiErrorMessage({isAxiosError:true,response:{data:'<html>erro</html>'}},'Falha no envio.'),'Falha no envio.');
 });
+test('narrative provider errors explain the safe recovery action', () => {
+  assert.match(getApiErrorMessage({isAxiosError:true,response:{data:{error:'incomplete_model_response'}}},'Falha'),/checkpoint/);
+  assert.match(getApiErrorMessage({isAxiosError:true,response:{data:{error:'narrative_provider_not_configured'}}},'Falha'),/OPENROUTER_API_KEY/);
+});
