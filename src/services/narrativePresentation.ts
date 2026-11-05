@@ -33,9 +33,9 @@ export function runIsActive(run: NarrativeRun | null): boolean {
   return !!run && ['queued', 'processing', 'running', 'mapping', 'reducing', 'validating'].includes(run.status);
 }
 
-export function requestNarrativeGeneration(consent: boolean) {
+export function requestNarrativeGeneration(consent: boolean, newRevision = false) {
   if (!consent) throw new Error('Confirme o envio dos trechos da transcrição ao OpenRouter.');
-  return { consent: true };
+  return { consent: true, ...(newRevision ? { newRevision: true } : {}) };
 }
 
 export function candidateLabel(candidate: NarrativeCandidate): string {

@@ -14,6 +14,7 @@ test('narrative evidence links point at the immutable transcript entry', () => {
 test('generation requires explicit consent and active runs are pollable', () => {
   assert.throws(() => requestNarrativeGeneration(false), /Confirme/);
   assert.deepEqual(requestNarrativeGeneration(true), { consent: true });
+  assert.deepEqual(requestNarrativeGeneration(true, true), { consent: true, newRevision: true });
   assert.equal(runIsActive({ runId: 'r-1', status: 'processing' }), true);
   assert.equal(runIsActive({ runId: 'r-2', status: 'awaiting_review' }), false);
 });

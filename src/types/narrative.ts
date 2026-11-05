@@ -13,6 +13,16 @@ export type NarrativeFact = {
   certainty?: string;
 };
 
+export type NarrativeSpeakerIdentity = {
+  userId: string | null;
+  speakerName: string;
+  characterId: string | null;
+  characterName: string | null;
+  speakerRole: 'player' | 'master' | 'spectator' | 'music_bot' | null;
+  bindingStatus: 'confirmed' | 'suggested' | 'ambiguous' | 'unbound';
+  bindingSource: string;
+};
+
 export type NarrativeCandidate = {
   id: string;
   kind: string;
@@ -50,6 +60,19 @@ export type NarrativeResult = {
   events?: NarrativeCandidate[];
   relationships?: NarrativeCandidate[];
   uncertainties?: NarrativeCandidate[];
+  speakerIdentities?: NarrativeSpeakerIdentity[];
+  usage?: {
+    inputTokens?: number;
+    outputTokens?: number;
+    totalTokens?: number;
+    costUsd?: number | null;
+    inputCacheHitTokens?: number | null;
+    inputCacheMissTokens?: number | null;
+    reasoningTokens?: number | null;
+    costEstimated?: boolean;
+    costSource?: 'provider' | 'estimated' | 'unknown';
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 };
 

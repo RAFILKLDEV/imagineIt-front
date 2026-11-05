@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 // Single source of truth for the backend URL so requests and image links stay aligned
-export const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
+const viteEnv = (import.meta as ImportMeta & { env?: { VITE_API_URL?: string } }).env;
+export const API_URL = (viteEnv?.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 
 export const api = axios.create({
   baseURL: API_URL,
