@@ -7,7 +7,10 @@ export function getApiErrorMessage(error: unknown, fallback: string): string {
       if (typeof data.message === 'string' && data.message.trim()) return data.message;
       if (typeof data.error === 'string' && data.error.trim()) {
         const messages: Record<string, string> = {
-          narrative_provider_not_configured: 'Configure DEEPSEEK_API_KEY ou OPENROUTER_API_KEY conforme o provedor selecionado e reinicie o backend.',
+          narrative_provider_not_configured: 'Configure OPENAI_API_KEY e reinicie o backend. OPENROUTER_API_KEY é apenas legado e não é utilizado.',
+          openai_budget_exceeded: 'O limite de custo desta execução foi atingido antes de uma nova chamada.',
+          openai_rate_limited: 'A OpenAI limitou temporariamente as requisições. Retome mais tarde.',
+          openai_model_unavailable: 'O modelo GPT-6 Luna não está disponível para esta conta.',
           deepseek_insufficient_balance: 'O saldo da conta DeepSeek é insuficiente. O checkpoint foi preservado.',
           deepseek_budget_exceeded: 'O limite de custo desta execução foi atingido antes de uma nova chamada.',
           deepseek_rate_limited: 'A DeepSeek limitou temporariamente as requisições. Retome mais tarde.',

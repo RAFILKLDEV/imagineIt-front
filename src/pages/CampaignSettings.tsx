@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { getApiErrorMessage } from '../services/apiError';
 import { useCampaign } from '../context/CampaignContext';
 import { useToast } from '../hooks/useToast';
+import { CampaignKnowledgePanel } from '../components/CampaignKnowledgePanel';
 
 type Settings = {
   nome: string;
@@ -38,6 +39,10 @@ export default function CampaignSettings() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [loadedId, setLoadedId] = useState<string>();
+
+  useEffect(() => {
+    if (id && current?._id !== id) setCurrentById(id);
+  }, [id, current?._id, setCurrentById]);
 
   useEffect(() => {
     let disposed = false;
@@ -87,7 +92,7 @@ export default function CampaignSettings() {
       <div className="mx-auto max-w-4xl space-y-6">
         <header className="it-panel it-glow it-grid-texture p-8">
           <Link to="/" className="text-sm text-emerald-300 hover:underline">← Voltar para campanhas</Link>
-          <h1 className="mt-5 text-3xl font-semibold text-white">Configurações da campanha</h1>
+          <h1 className="mt-5 text-3xl font-semibold text-white">Campanha</h1>
           <p className="mt-2 text-sm text-white/60">{ready ? form.nome : 'Gerencie os dados da campanha e a conexão com o gravador Discord.'}</p>
         </header>
         {error && <p role="alert" className="rounded-2xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
@@ -133,6 +138,7 @@ export default function CampaignSettings() {
               {saving ? 'Salvando...' : 'Salvar configurações'}
             </button>
           </form>
+          <CampaignKnowledgePanel campaignId={id!} />
           <section className="it-panel space-y-4 p-6 sm:p-8">
             <h2 className="text-lg font-semibold text-white">Gravação no Discord</h2>
             <Link to="/live" onClick={() => setCurrentById(id!)} className="inline-block rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white">Abrir transcrição ao vivo</Link>

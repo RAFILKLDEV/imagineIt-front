@@ -80,7 +80,7 @@ export default function SessionBenchmark() {
       <Link to={`/sessions/${id}`} className="text-sm text-emerald-300">← Voltar à transcrição</Link>
       <h1 className="text-3xl font-semibold">Avaliar transcrição salva</h1>
       <p className="text-white/70">{data?.title || 'Carregando sessão...'}</p>
-      <p className="text-sm text-emerald-200">Sem novas chamadas ao Groq. Usa o texto já transcrito e cópias curtas dos áudios locais.</p>
+      <p className="text-sm text-emerald-200">Sem novas chamadas à xAI. Usa o texto já transcrito e cópias curtas dos áudios locais.</p>
     </header>
     {error && <p role="alert" className="rounded-xl bg-red-500/10 p-4 text-red-200">{error}</p>}
     {notice && <p role="status" className="rounded-xl bg-emerald-500/10 p-4 text-emerald-200">{notice}</p>}

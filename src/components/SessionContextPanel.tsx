@@ -33,6 +33,8 @@ export function applySuggestion(draft: Draft, suggestion: ContextSuggestion): Dr
     next.aliasesText = appendLine(next.aliasesText, aliasValue);
   } else if (suggestion.field === 'playerCharacterBinding') {
     next.additionalNotes = appendLine(next.additionalNotes, `Vínculo sugerido (confirme em Identidade da sessão): ${value}`);
+  } else if (suggestion.field === 'items') {
+    next.additionalNotes = appendLine(next.additionalNotes, `Item: ${value}`);
   } else if (suggestion.field === 'npcNotes') {
     next.npcNotesText = appendLine(next.npcNotesText, value);
   } else if (suggestion.field === 'locations') {
@@ -45,7 +47,7 @@ export function applySuggestion(draft: Draft, suggestion: ContextSuggestion): Dr
 }
 
 const fieldLabels: Record<ContextSuggestion['field'], string> = {
-  previousEvents: 'Acontecimentos anteriores', currentSituation: 'Situação atual', conflicts: 'Conflito', aliases: 'Apelido', npcNotes: 'NPC', locations: 'Local', objectives: 'Objetivo', gmSecrets: 'Segredo do mestre', additionalNotes: 'Contexto adicional', playerCharacterBinding: 'Vínculo sugerido'
+  previousEvents: 'Acontecimentos anteriores', currentSituation: 'Situação atual', conflicts: 'Conflito', aliases: 'Apelido', npcNotes: 'NPC', locations: 'Local', items: 'Item', objectives: 'Objetivo', gmSecrets: 'Segredo do mestre', additionalNotes: 'Contexto adicional', playerCharacterBinding: 'Vínculo sugerido'
 };
 
 function toDraft(value: Partial<SessionNarrativeContext> | undefined): Draft {

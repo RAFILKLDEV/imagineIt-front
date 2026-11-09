@@ -30,6 +30,9 @@ export function CampaignProvider({ children }: { children: React.ReactNode }) {
       const selected =
         (storedId && data.find((c: Campaign) => c._id === storedId)) || data[0];
       if (selected) setCurrent(selected);
+    }).catch(() => {
+      setCampaigns([]);
+      setCurrent(undefined);
     });
   }, []);
 

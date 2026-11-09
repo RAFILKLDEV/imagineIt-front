@@ -7,6 +7,17 @@ export const API_URL = (viteEnv?.VITE_API_URL || 'http://localhost:4000').replac
 
 export const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
+});
+
+api.interceptors.response.use(undefined, (error) => {
+  const requestUrl = String(error?.config?.url || '');
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname.replace(/\/+$/, '') : '';
+  const isAuthRequest = requestUrl.startsWith('/auth/') || requestUrl.includes('/auth/');
+  if (error?.response?.status === 401 && !isAuthRequest && typeof window !== 'undefined' && currentPath !== '/login') {
+    window.location.assign('/login');
+  }
+  return Promise.reject(error);
 });
 
 // Helper to normalize image fields returned by the API

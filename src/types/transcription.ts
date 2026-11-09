@@ -21,6 +21,13 @@ export interface TranscriptWord {
   probability?: number;
 }
 
+export interface CampaignKnowledge {
+  context: SessionNarrativeContext;
+  items: string[];
+  discordBindings: Array<{ userId: string; playerName: string; characterIds: string[]; status: 'confirmed' | 'suggested' }>;
+  updatedAt?: string;
+}
+
 export interface TranscriptItem {
   entryId?: string;
   userId?: string;
@@ -221,7 +228,7 @@ export interface SessionNarrativeContext {
   updatedAt?: string;
 }
 
-export type ContextSuggestionField = 'previousEvents' | 'currentSituation' | 'conflicts' | 'aliases' | 'npcNotes' | 'locations' | 'objectives' | 'gmSecrets' | 'additionalNotes' | 'playerCharacterBinding';
+export type ContextSuggestionField = 'previousEvents' | 'currentSituation' | 'conflicts' | 'aliases' | 'npcNotes' | 'locations' | 'items' | 'objectives' | 'gmSecrets' | 'additionalNotes' | 'playerCharacterBinding';
 export interface ContextSuggestionCandidate {
   entityId?: string | null;
   entityType?: string;
@@ -240,6 +247,7 @@ export interface ContextSuggestion {
   candidates: ContextSuggestionCandidate[];
   status: 'pending' | 'accepted' | 'rejected';
   editedValue?: string;
+  effectiveFromSessionNumber?: number;
 }
 
 export interface Session {
@@ -259,6 +267,11 @@ export interface Session {
   transcriptionSettings?: TranscriptionSettings;
   speakerBindings?: SpeakerBinding[];
   narrativeContext?: SessionNarrativeContext;
+  campaignKnowledge?: {
+    knowledge: CampaignKnowledge;
+    characters: Array<{ _id: string; nome: string; jogador?: string; tipo?: string; apelidos?: string[]; relacionamentos?: Array<{ personagemId?: string; tipo?: string; descricao?: string }> }>;
+    scenarios: Array<{ _id: string; nome: string; tipo?: string }>;
+  };
   transcription?: SessionTranscription;
 }
 

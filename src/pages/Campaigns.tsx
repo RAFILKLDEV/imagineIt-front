@@ -19,13 +19,13 @@ export default function Campaigns() {
     await reloadCampaigns();
     setCurrentById(r.data._id);
     setNome('');
-    navigate('/characters');
+    navigate(`/campaigns/${r.data._id}`);
     notify('Campanha criada', { type: 'success' });
   }
 
   function handleSelect(id: string) {
     setCurrentById(id);
-    navigate('/characters');
+    navigate(`/campaigns/${id}`);
   }
 
   return (
@@ -102,8 +102,8 @@ export default function Campaigns() {
                     {current?._id === c._id && (
                       <span className="text-xs uppercase tracking-[0.3em] text-emerald-300">Ativa</span>
                     )}
-                    <Link to={`/campaigns/${c._id}/settings`} className="rounded-xl border border-white/20 px-3 py-2 text-xs hover:border-emerald-400 hover:text-emerald-300" aria-label={`Configurações de ${c.nome}`}>
-                      Configurações
+                    <Link to={`/campaigns/${c._id}`} className="rounded-xl border border-white/20 px-3 py-2 text-xs hover:border-emerald-400 hover:text-emerald-300" aria-label={`Abrir campanha ${c.nome}`}>
+                      Abrir campanha
                     </Link>
                   </div>
                 ))}

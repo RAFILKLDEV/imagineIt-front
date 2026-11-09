@@ -93,8 +93,8 @@ export default function LiveRecording() {
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="it-panel it-glow it-grid-texture p-8">
           <p className="text-xs uppercase tracking-[0.3em] text-emerald-300">{current?.nome || 'Selecione uma campanha'}</p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">Transcrição ao vivo</h1>
-          <p className="mt-3 text-sm text-white/60">O envio agora é manual: grave no Discord, encerre com /record stop e abra Sessões para usar Enviar transcrição. Os silêncios serão removidos antes do envio ao Groq. As transcrições ao vivo anteriores continuam disponíveis abaixo.</p>
+          <h1 className="mt-3 text-3xl font-semibold text-white">Transcrição ao vivo</h1><p className="mt-2 text-xs text-emerald-200">Modelo efetivo: xAI · grok-voice-transcribe-2.0</p>
+          <p className="mt-3 text-sm text-white/60">O envio agora é manual: grave no Discord, encerre com /record stop e abra Sessões para usar Enviar transcrição. A captura e o processamento usam xAI Grok Voice Transcribe 2.0; as transcrições ao vivo anteriores continuam disponíveis abaixo.</p>
           <Link to="/sessions" className="it-secondary mt-5 inline-flex">Abrir Sessões e enviar transcrição</Link>
         </header>
         {!current && <Link to="/" className="inline-block text-emerald-300 underline">Selecionar campanha</Link>}

@@ -14,6 +14,8 @@ function Glyph({ name }: { name: string }) {
     map: 'm3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z M9 3v15 M15 6v15',
     settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6 M4 12l2-1 .5-2L5 7l2-2 2 1.5 2-.5 1-2h3l1 2 2 .5L20 5l2 2-1.5 2 .5 2 2 1v2l-2 1-.5 2L22 19l-2 2-2-1.5-2 .5-1 2h-3l-1-2-2-.5L7 21l-2-2 1.5-2-.5-2-2-1z',
     lab: 'M9 3h6 M10 3v7l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3 M8 16h8',
+    credits: 'M12 2v20 M17 5.5c-.8-1-2.1-1.5-4-1.5-2.8 0-4.5 1.3-4.5 3.2 0 5 9.5 2.2 9.5 7 0 2-1.8 3.3-4.8 3.3-2 0-3.5-.6-4.5-1.8',
+    account: 'M20 21a8 8 0 0 0-16 0 M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8',
     chevron: 'm7 10 5 5 5-5',
     fold: 'M15 18 9 12l6-6',
     menu: 'M3 6h18 M3 12h18 M3 18h18',
@@ -75,6 +77,8 @@ export default function Sidebar() {
         </>}
         {!compact && <p className="it-side-group">Ferramentas</p>}
         {nav('/benchmarks', 'Benchmarks', 'lab')}
+        {nav('/credits', 'Meus créditos', 'credits')}
+        {nav('/account', 'Minha conta', 'account')}
       </nav>
       <div className="it-side-bottom"><button type="button" className="it-collapse" onClick={toggle} aria-label={compact ? 'Expandir menu' : 'Recolher menu'}><Glyph name="fold"/>{!compact && <span>Recolher menu</span>}</button></div>
     </aside>

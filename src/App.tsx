@@ -12,16 +12,17 @@ import CampaignSettings from './pages/CampaignSettings';
 import LiveRecording from './pages/LiveRecording';
 import Benchmarks from './pages/Benchmarks';
 import SessionBenchmark from './pages/SessionBenchmark';
+import Credits from './pages/Credits';
+import Login from './pages/Login';
+import Account from './pages/Account';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
-export default function App(){
-  return (
-    <BrowserRouter>
-      <CampaignProvider>
-        <ToastProvider>
-          <AppLayout>
-            <Routes>
+function ProtectedApp() {
+  return <ProtectedRoute><CampaignProvider><ToastProvider><AppLayout><Routes>
               <Route path="/" element={<Campaigns/>}/>
               <Route path="/dashboard" element={<Dashboard/>}/>
+              <Route path="/campaigns/:id" element={<CampaignSettings/>}/>
               <Route path="/campaigns/:id/settings" element={<CampaignSettings/>}/>
               <Route path="/live" element={<LiveRecording/>}/>
               <Route path="/benchmarks" element={<Benchmarks/>}/>
@@ -31,10 +32,11 @@ export default function App(){
               <Route path="/sessions" element={<Sessions/>}/>
               <Route path="/scenarios" element={<Scenarios/>}/>
               <Route path="/sessions/:id" element={<SessionViewer />} />
-            </Routes>
-          </AppLayout>
-        </ToastProvider>
-      </CampaignProvider>
-    </BrowserRouter>
-  );
+              <Route path="/credits" element={<Credits />} />
+              <Route path="/account" element={<Account />} />
+  </Routes></AppLayout></ToastProvider></CampaignProvider></ProtectedRoute>;
+}
+
+export default function App(){
+  return <BrowserRouter><AuthProvider><Routes><Route path="/login" element={<Login />} /><Route path="*" element={<ProtectedApp />} /></Routes></AuthProvider></BrowserRouter>;
 }
